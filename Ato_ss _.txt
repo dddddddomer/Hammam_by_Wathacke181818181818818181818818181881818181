@@ -1,0 +1,1476 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+local function randomString(length)
+    local s = ""
+    for i = 1, length do
+        local r = math.random(1, #chars)
+        s = s .. chars:sub(r, r)
+    end
+    return s
+end
+
+local glyphs = "@#$%^&*()_+-=[]{}|;:',.<>/?~`!№"
+local function randomGlyphs(length)
+    local s = ""
+    for i = 1, length do
+        local r = math.random(1, #glyphs)
+        s = s .. glyphs:sub(r, r)
+    end
+    return s
+end
+
+local attachActivated = true
+local isMinimized = false
+local isFullscreen = false
+local normalSize = UDim2.new(0, 540, 0, 340)
+local normalPos = UDim2.new(0.5, -270, 0.5, -170)
+local savedSize = normalSize
+local savedPos = normalPos
+local PIXEL_FONT = Enum.Font.Arcade
+
+local gui = Instance.new("ScreenGui")
+gui.Name = randomString(15)
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
+
+-- ===== STARTUP LOGO =====
+local startBall = Instance.new("ImageLabel")
+startBall.Size = UDim2.new(0, 100, 0, 100)
+startBall.Position = UDim2.new(-0.127, 0, 0.408, 0)
+startBall.BackgroundTransparency = 1
+startBall.Image = "rbxassetid://120490732859728"
+startBall.Parent = gui
+
+local startATO = Instance.new("TextLabel")
+startATO.Size = UDim2.new(0, 160, 0, 100)
+startATO.Position = UDim2.new(0.9, 30, 0, 0)
+startATO.BackgroundTransparency = 1
+startATO.Visible = false
+startATO.TextSize = 22
+startATO.Text = "ATO/S328\n\nWritten by simmul,\nze0r, and Deniied"
+startATO.TextColor3 = Color3.new(1, 1, 1)
+startATO.Font = PIXEL_FONT
+startATO.TextWrapped = true
+startATO.Parent = startBall
+startATO.TextXAlignment = Enum.TextXAlignment.Left
+startATO.TextYAlignment = Enum.TextYAlignment.Top
+
+startBall:TweenPosition(UDim2.new(0.410, 0, 0.400, 0), "Out", "Linear", 0.4, false)
+wait(3)
+startBall:TweenPosition(UDim2.new(0.01, 0, 0.763, 0), "Out", "Sine", 0.7, false)
+wait(1)
+startATO.Visible = true
+
+local startInfo = TweenInfo.new(1.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+local startTweenUp = TweenService:Create(startBall, startInfo, {Rotation = 5})
+local startTweenDown = TweenService:Create(startBall, startInfo, {Rotation = -5})
+task.spawn(function()
+    while true do
+        startTweenUp:Play()
+        startTweenUp.Completed:Wait()
+        startTweenDown:Play()
+        startTweenDown.Completed:Wait()
+    end
+end)
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = normalSize
+mainFrame.Position = normalPos
+mainFrame.BackgroundTransparency = 1
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Parent = gui
+
+local innerFrame = Instance.new("Frame")
+innerFrame.Size = UDim2.new(1, 0, 1, 0)
+innerFrame.Position = UDim2.new(0, 0, 0, 0)
+innerFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+innerFrame.BackgroundTransparency = 0
+innerFrame.BorderSizePixel = 0
+innerFrame.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(60, 60, 60)
+mainStroke.Thickness = 0
+mainStroke.Parent = innerFrame
+
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 20)
+titleBar.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+titleBar.BorderSizePixel = 0
+titleBar.Active = true
+titleBar.Parent = innerFrame
+
+local logoImage = Instance.new("ImageLabel")
+logoImage.Size = UDim2.new(0, 14, 0, 14)
+logoImage.Position = UDim2.new(0, 3, 0, 3)
+logoImage.BackgroundTransparency = 1
+logoImage.Image = "rbxassetid://120490732859728"
+logoImage.ZIndex = 2
+logoImage.Parent = titleBar
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(0, 32, 1, 0)
+titleLabel.Position = UDim2.new(0, 20, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "ATO"
+titleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+titleLabel.TextSize = 11
+titleLabel.Font = PIXEL_FONT
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.ZIndex = 2
+titleLabel.Parent = titleBar
+
+local glyphLabel = Instance.new("TextLabel")
+glyphLabel.Size = UDim2.new(1, -100, 1, 0)
+glyphLabel.Position = UDim2.new(0, 50, 0, 0)
+glyphLabel.BackgroundTransparency = 1
+glyphLabel.Text = randomGlyphs(60)
+glyphLabel.TextColor3 = Color3.fromRGB(60, 60, 60)
+glyphLabel.TextTransparency = 0.5
+glyphLabel.TextScaled = true
+glyphLabel.Font = PIXEL_FONT
+glyphLabel.TextXAlignment = Enum.TextXAlignment.Left
+glyphLabel.TextYAlignment = Enum.TextYAlignment.Center
+glyphLabel.ZIndex = 2
+glyphLabel.Parent = titleBar
+
+task.spawn(function()
+    while glyphLabel and glyphLabel.Parent do
+        task.wait(0.3)
+        glyphLabel.Text = randomGlyphs(60)
+    end
+end)
+
+task.spawn(function()
+    local shades = {30, 45, 60, 75, 90, 75, 60, 45}
+    local index = 1
+    while glyphLabel and glyphLabel.Parent do
+        local c = shades[index]
+        glyphLabel.TextColor3 = Color3.fromRGB(c, c, c)
+        index = index + 1
+        if index > #shades then index = 1 end
+        task.wait(0.5)
+    end
+end)
+
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 18, 1, 0)
+minimizeBtn.Position = UDim2.new(1, -56, 0, 0)
+minimizeBtn.BackgroundTransparency = 1
+minimizeBtn.Text = "—"
+minimizeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+minimizeBtn.TextSize = 13
+minimizeBtn.Font = PIXEL_FONT
+minimizeBtn.ZIndex = 11
+minimizeBtn.Parent = titleBar
+
+local fullscreenBtn = Instance.new("TextButton")
+fullscreenBtn.Size = UDim2.new(0, 18, 1, 0)
+fullscreenBtn.Position = UDim2.new(1, -38, 0, 0)
+fullscreenBtn.BackgroundTransparency = 1
+fullscreenBtn.Text = "□"
+fullscreenBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+fullscreenBtn.TextSize = 13
+fullscreenBtn.Font = PIXEL_FONT
+fullscreenBtn.ZIndex = 11
+fullscreenBtn.Parent = titleBar
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 20, 1, 0)
+closeBtn.Position = UDim2.new(1, -20, 0, 0)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+closeBtn.TextSize = 11
+closeBtn.Font = PIXEL_FONT
+closeBtn.ZIndex = 11
+closeBtn.Parent = titleBar
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+-- ===== MENU / SETTINGS TABS =====
+local tabBar = Instance.new("Frame")
+tabBar.Size = UDim2.new(1, 0, 0, 24)
+tabBar.Position = UDim2.new(0, 0, 0, 18)
+tabBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+tabBar.BorderSizePixel = 0
+tabBar.Parent = innerFrame
+
+local menuBtn = Instance.new("TextButton")
+menuBtn.Size = UDim2.new(0, 60, 0, 20)
+menuBtn.Position = UDim2.new(0, 1, 0, 2)
+menuBtn.BackgroundColor3 = Color3.fromRGB(210, 210, 210)
+menuBtn.BorderColor3 = Color3.fromRGB(150, 150, 150)
+menuBtn.BorderSizePixel = 1
+menuBtn.Text = "Menu"
+menuBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+menuBtn.TextSize = 13
+menuBtn.Font = Enum.Font.Arcade
+menuBtn.Parent = tabBar
+
+local settingsBtn = Instance.new("TextButton")
+settingsBtn.Size = UDim2.new(0, 70, 0, 20)
+settingsBtn.Position = UDim2.new(0, 61, 0, 2)
+settingsBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+settingsBtn.BorderColor3 = Color3.fromRGB(150, 150, 150)
+settingsBtn.BorderSizePixel = 1
+settingsBtn.Text = "Settings"
+settingsBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+settingsBtn.TextSize = 13
+settingsBtn.Font = Enum.Font.Arcade
+settingsBtn.Parent = tabBar
+
+local hiddenByMinimize = {}
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+
+    if isMinimized then
+        savedSize = mainFrame.Size
+        savedPos = mainFrame.Position
+        hiddenByMinimize = {}
+
+        for _, child in ipairs(innerFrame:GetChildren()) do
+            if child:IsA("GuiObject") and child ~= titleBar then
+                hiddenByMinimize[child] = child.Visible
+                child.Visible = false
+            end
+        end
+
+        mainFrame.Size = UDim2.new(savedSize.X.Scale, savedSize.X.Offset, 0, 20)
+        minimizeBtn.Text = "+"
+    else
+        for child, wasVisible in pairs(hiddenByMinimize) do
+            if child and child.Parent then
+                child.Visible = wasVisible
+            end
+        end
+        hiddenByMinimize = {}
+
+        mainFrame.Size = savedSize
+        mainFrame.Position = savedPos
+        minimizeBtn.Text = "—"
+    end
+end)
+
+fullscreenBtn.MouseButton1Click:Connect(function()
+    isFullscreen = not isFullscreen
+    if isFullscreen then
+        normalSize = mainFrame.Size
+        normalPos = mainFrame.Position
+        mainFrame.Size = UDim2.new(1, 0, 1, 0)
+        mainFrame.Position = UDim2.new(0, 0, 0, 0)
+    else
+        mainFrame.Size = normalSize
+        mainFrame.Position = normalPos
+    end
+end)
+
+-- ===== TEXTBOX WITH LINE NUMBERS AND ARROWS =====
+local textBoxContainer = Instance.new("Frame")
+textBoxContainer.Size = UDim2.new(0, 320, 0, 170)
+textBoxContainer.Position = UDim2.new(0, 6, 0, 46)
+textBoxContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+textBoxContainer.BorderColor3 = Color3.fromRGB(0, 0, 0)
+textBoxContainer.BorderSizePixel = 1
+textBoxContainer.ClipsDescendants = true
+textBoxContainer.Active = true
+textBoxContainer.Parent = innerFrame
+
+local lineNumbersBg = Instance.new("Frame")
+lineNumbersBg.Size = UDim2.new(0, 28, 1, 0)
+lineNumbersBg.Position = UDim2.new(0, 0, 0, 0)
+lineNumbersBg.BackgroundColor3 = Color3.fromRGB(235, 235, 235)
+lineNumbersBg.BorderSizePixel = 0
+lineNumbersBg.ClipsDescendants = true
+lineNumbersBg.ZIndex = 2
+lineNumbersBg.Parent = textBoxContainer
+
+local lineNumbers = Instance.new("TextLabel")
+lineNumbers.Size = UDim2.new(1, 0, 0, 0)
+lineNumbers.Position = UDim2.new(0, 0, 0, 0)
+lineNumbers.BackgroundTransparency = 1
+lineNumbers.Text = "1"
+lineNumbers.TextSize = 11
+lineNumbers.Font = PIXEL_FONT
+lineNumbers.TextColor3 = Color3.fromRGB(120, 120, 120)
+lineNumbers.TextXAlignment = Enum.TextXAlignment.Right
+lineNumbers.TextYAlignment = Enum.TextYAlignment.Top
+lineNumbers.TextWrapped = false
+lineNumbers.AutomaticSize = Enum.AutomaticSize.Y
+lineNumbers.ZIndex = 3
+lineNumbers.Parent = lineNumbersBg
+
+local lineSeparator = Instance.new("Frame")
+lineSeparator.Size = UDim2.new(0, 1, 1, 0)
+lineSeparator.Position = UDim2.new(0, 28, 0, 0)
+lineSeparator.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+lineSeparator.BorderSizePixel = 0
+lineSeparator.ZIndex = 4
+lineSeparator.Parent = textBoxContainer
+
+local textScrollingFrame = Instance.new("ScrollingFrame")
+textScrollingFrame.Size = UDim2.new(1, -44, 1, 0)
+textScrollingFrame.Position = UDim2.new(0, 28, 0, 0)
+textScrollingFrame.BackgroundTransparency = 1
+textScrollingFrame.BorderSizePixel = 0
+textScrollingFrame.ScrollBarThickness = 0
+textScrollingFrame.ScrollingEnabled = true
+textScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+textScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+textScrollingFrame.ClipsDescendants = true
+textScrollingFrame.ZIndex = 3
+textScrollingFrame.Parent = textBoxContainer
+
+local mainTextBox = Instance.new("TextBox")
+mainTextBox.Size = UDim2.new(1, 0, 0, 0)
+mainTextBox.Position = UDim2.new(0, 0, 0, 0)
+mainTextBox.BackgroundTransparency = 1
+mainTextBox.BorderSizePixel = 0
+mainTextBox.Text = ""
+mainTextBox.TextSize = 11
+mainTextBox.Font = PIXEL_FONT
+mainTextBox.TextXAlignment = Enum.TextXAlignment.Left
+mainTextBox.TextYAlignment = Enum.TextYAlignment.Top
+mainTextBox.MultiLine = true
+mainTextBox.ClearTextOnFocus = false
+mainTextBox.TextWrapped = false
+mainTextBox.AutomaticSize = Enum.AutomaticSize.Y
+mainTextBox.ZIndex = 3
+mainTextBox.Parent = textScrollingFrame
+
+textBoxContainer.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        mainTextBox:CaptureFocus()
+    end
+end)
+
+textScrollingFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        mainTextBox:CaptureFocus()
+    end
+end)
+
+local function updateLineNumbers()
+    local count = 1
+    for _ in string.gmatch(mainTextBox.Text, "\n") do
+        count = count + 1
+    end
+    local s = ""
+    for i = 1, count do
+        s = s .. i .. "\n"
+    end
+    lineNumbers.Text = s
+end
+
+local textScrollBarBg = Instance.new("Frame")
+textScrollBarBg.Size = UDim2.new(0, 16, 1, 0)
+textScrollBarBg.Position = UDim2.new(1, -16, 0, 0)
+textScrollBarBg.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+textScrollBarBg.BorderColor3 = Color3.fromRGB(160, 160, 160)
+textScrollBarBg.BorderSizePixel = 1
+textScrollBarBg.ZIndex = 5
+textScrollBarBg.Parent = textBoxContainer
+
+local textArrowUp = Instance.new("TextButton")
+textArrowUp.Size = UDim2.new(1, 0, 0, 16)
+textArrowUp.Position = UDim2.new(0, 0, 0, 0)
+textArrowUp.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+textArrowUp.BorderSizePixel = 0
+textArrowUp.Text = ""
+textArrowUp.AutoButtonColor = false
+textArrowUp.ZIndex = 6
+textArrowUp.Parent = textScrollBarBg
+
+local tuL = Instance.new("Frame")
+tuL.Size = UDim2.new(0, 5, 0, 1)
+tuL.Position = UDim2.new(0.5, -4, 0.5, 1)
+tuL.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+tuL.BorderSizePixel = 0
+tuL.Rotation = -45
+tuL.ZIndex = 7
+tuL.Parent = textArrowUp
+
+local tuR = Instance.new("Frame")
+tuR.Size = UDim2.new(0, 5, 0, 1)
+tuR.Position = UDim2.new(0.5, -1, 0.5, 1)
+tuR.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+tuR.BorderSizePixel = 0
+tuR.Rotation = 45
+tuR.ZIndex = 7
+tuR.Parent = textArrowUp
+
+local textArrowDown = Instance.new("TextButton")
+textArrowDown.Size = UDim2.new(1, 0, 0, 16)
+textArrowDown.Position = UDim2.new(0, 0, 1, -16)
+textArrowDown.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+textArrowDown.BorderSizePixel = 0
+textArrowDown.Text = ""
+textArrowDown.AutoButtonColor = false
+textArrowDown.ZIndex = 6
+textArrowDown.Parent = textScrollBarBg
+
+local tdL = Instance.new("Frame")
+tdL.Size = UDim2.new(0, 5, 0, 1)
+tdL.Position = UDim2.new(0.5, -4, 0.5, 1)
+tdL.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+tdL.BorderSizePixel = 0
+tdL.Rotation = 45
+tdL.ZIndex = 7
+tdL.Parent = textArrowDown
+
+local tdR = Instance.new("Frame")
+tdR.Size = UDim2.new(0, 5, 0, 1)
+tdR.Position = UDim2.new(0.5, -1, 0.5, 1)
+tdR.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+tdR.BorderSizePixel = 0
+tdR.Rotation = -45
+tdR.ZIndex = 7
+tdR.Parent = textArrowDown
+
+local textTrack = Instance.new("Frame")
+textTrack.Size = UDim2.new(1, 0, 1, -32)
+textTrack.Position = UDim2.new(0, 0, 0, 16)
+textTrack.BackgroundColor3 = Color3.fromRGB(225, 225, 225)
+textTrack.BorderSizePixel = 0
+textTrack.ZIndex = 5
+textTrack.Parent = textScrollBarBg
+
+local textThumb = Instance.new("TextButton")
+textThumb.Size = UDim2.new(1, -2, 0, 40)
+textThumb.Position = UDim2.new(0, 1, 0, 0)
+textThumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205)
+textThumb.BorderColor3 = Color3.fromRGB(120, 120, 120)
+textThumb.BorderSizePixel = 1
+textThumb.Text = ""
+textThumb.AutoButtonColor = false
+textThumb.ZIndex = 6
+textThumb.Parent = textTrack
+
+local function updateTextThumb()
+    local canvasY = textScrollingFrame.AbsoluteCanvasSize.Y
+    local viewY = textScrollingFrame.AbsoluteSize.Y
+    if canvasY <= viewY then
+        textThumb.Visible = false
+        return
+    else
+        textThumb.Visible = true
+    end
+
+    local trackHeight = textTrack.AbsoluteSize.Y
+    local ratio = viewY / canvasY
+    local thumbHeight = math.max(20, trackHeight * ratio)
+    textThumb.Size = UDim2.new(1, -2, 0, thumbHeight)
+
+    local maxScroll = canvasY - viewY
+    local scrollRatio = 0
+    if maxScroll > 0 then
+        scrollRatio = textScrollingFrame.CanvasPosition.Y / maxScroll
+    end
+    local maxThumbY = trackHeight - thumbHeight
+    textThumb.Position = UDim2.new(0, 1, 0, maxThumbY * scrollRatio)
+end
+
+textScrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+    updateTextThumb()
+    lineNumbers.Position = UDim2.new(0, 0, 0, -textScrollingFrame.CanvasPosition.Y)
+end)
+
+textScrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateTextThumb)
+textScrollingFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateTextThumb)
+
+mainTextBox:GetPropertyChangedSignal("Text"):Connect(function()
+    updateTextThumb()
+    updateLineNumbers()
+end)
+
+updateLineNumbers()
+task.wait(0.1)
+updateTextThumb()
+
+local textThumbDragging = false
+local textThumbDragStart = nil
+local textThumbStartY = nil
+
+textThumb.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        textThumbDragging = true
+        textThumb.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        textThumbDragStart = input.Position.Y
+        textThumbStartY = textThumb.Position.Y.Offset
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if textThumbDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position.Y - textThumbDragStart
+        local newY = textThumbStartY + delta
+        local trackHeight = textTrack.AbsoluteSize.Y
+        local thumbHeight = textThumb.AbsoluteSize.Y
+        local maxThumbY = trackHeight - thumbHeight
+        if newY < 0 then newY = 0 end
+        if newY > maxThumbY then newY = maxThumbY end
+        textThumb.Position = UDim2.new(0, 1, 0, newY)
+
+        local ratio = 0
+        if maxThumbY > 0 then ratio = newY / maxThumbY end
+        local maxScroll = textScrollingFrame.AbsoluteCanvasSize.Y - textScrollingFrame.AbsoluteSize.Y
+        if maxScroll < 0 then maxScroll = 0 end
+        textScrollingFrame.CanvasPosition = Vector2.new(0, maxScroll * ratio)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if textThumbDragging then
+            textThumbDragging = false
+            textThumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205)
+        end
+    end
+end)
+
+textArrowUp.MouseEnter:Connect(function() textArrowUp.BackgroundColor3 = Color3.fromRGB(220, 220, 220) end)
+textArrowUp.MouseLeave:Connect(function() textArrowUp.BackgroundColor3 = Color3.fromRGB(240, 240, 240) end)
+textArrowDown.MouseEnter:Connect(function() textArrowDown.BackgroundColor3 = Color3.fromRGB(220, 220, 220) end)
+textArrowDown.MouseLeave:Connect(function() textArrowDown.BackgroundColor3 = Color3.fromRGB(240, 240, 240) end)
+
+-- ===== MENU BUTTONS =====
+local executeBtn = Instance.new("TextButton")
+executeBtn.Size = UDim2.new(0, 78, 0, 20)
+executeBtn.Position = UDim2.new(0, 6, 0, 222)
+executeBtn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+executeBtn.Text = "Execute"
+executeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+executeBtn.TextSize = 10
+executeBtn.Font = PIXEL_FONT
+executeBtn.Parent = innerFrame
+
+local clearBtn = Instance.new("TextButton")
+clearBtn.Size = UDim2.new(0, 78, 0, 20)
+clearBtn.Position = UDim2.new(0, 90, 0, 222)
+clearBtn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+clearBtn.Text = "clear"
+clearBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+clearBtn.TextSize = 10
+clearBtn.Font = PIXEL_FONT
+clearBtn.Parent = innerFrame
+
+local reBtn = Instance.new("TextButton")
+reBtn.Size = UDim2.new(0, 78, 0, 20)
+reBtn.Position = UDim2.new(0, 174, 0, 222)
+reBtn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+reBtn.Text = "RE"
+reBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+reBtn.TextSize = 10
+reBtn.Font = PIXEL_FONT
+reBtn.Parent = innerFrame
+
+local r6Btn = Instance.new("TextButton")
+r6Btn.Size = UDim2.new(0, 78, 0, 20)
+r6Btn.Position = UDim2.new(0, 258, 0, 222)
+r6Btn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+r6Btn.Text = "R6"
+r6Btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+r6Btn.TextSize = 10
+r6Btn.Font = PIXEL_FONT
+r6Btn.Parent = innerFrame
+
+-- ===== SETTINGS BUTTONS =====
+local configFrame = Instance.new("Frame")
+configFrame.Size = UDim2.new(1, -20, 1, -70)
+configFrame.Position = UDim2.new(0, 10, 0, 60)
+configFrame.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+configFrame.BorderSizePixel = 0
+configFrame.Visible = false
+configFrame.Active = true
+configFrame.ZIndex = 20
+configFrame.Parent = innerFrame
+
+local configNames = {
+    "Dex", "RE", "R6",
+    "anonymous", "Mr krabs", "Config 6",
+    "Config 7", "Config 8", "Config 9",
+    "Config 10", "Config 11", "Config 12",
+    "Config 13", "Config 14", "Config 15",
+    "Config 16", "Config 17", "Config 18",
+}
+
+local configUrls = {
+    "https://github.com/Hosvile/DEX-Explorer/releases/latest/download/main.lua",
+    "re", "r6",
+}
+
+local anonymousCode = [[-- ===== ANONYMOUS =====
+local soundId = "rbxassetid://1840712882"
+local sound = Instance.new("Sound")
+sound.Name = "BackgroundSound"
+sound.SoundId = soundId
+sound.Looped = true
+sound.Volume = 1
+sound.PlaybackSpeed = 1
+sound.Pitch = 0.9
+sound.Parent = game.Workspace
+local distortion = Instance.new("DistortionSoundEffect")
+distortion.Level = 1
+distortion.Parent = sound
+sound:Play()
+local decalId = "rbxassetid://127476787"
+local skyId = "rbxassetid://73053804512950"
+local function applyDecalToAllSides(part)
+    local faces = {Enum.NormalId.Top, Enum.NormalId.Bottom, Enum.NormalId.Left, Enum.NormalId.Right, Enum.NormalId.Front, Enum.NormalId.Back}
+    for _, face in ipairs(faces) do
+        local decal = Instance.new("Decal")
+        decal.Texture = decalId
+        decal.Face = face
+        decal.Parent = part
+    end
+end
+for _, part in ipairs(workspace:GetDescendants()) do
+    if part:IsA("BasePart") then applyDecalToAllSides(part) end
+end
+local sky = Instance.new("Sky")
+sky.SkyboxBk = skyId
+sky.SkyboxDn = skyId
+sky.SkyboxFt = skyId
+sky.SkyboxLf = skyId
+sky.SkyboxRt = skyId
+sky.SkyboxUp = skyId
+sky.Parent = game.Lighting
+task.wait(2)
+for _, part in pairs(game.Workspace:GetDescendants()) do
+    if part:IsA("BasePart") then part.Anchored = false end
+end
+]]
+
+local mrKrabsCode = [[local ID = "rbxassetid://134964081588127"
+local function spamDecals(root)
+    for _, v in pairs(root:GetChildren()) do
+        if v:IsA("Decal") and v.Texture ~= ID then
+            v:Destroy()
+        elseif v:IsA("BasePart") then
+            v.Material = Enum.Material.Plastic
+            v.Transparency = 0
+            local faces = {"Front","Back","Right","Left","Top","Bottom"}
+            for _, f in ipairs(faces) do
+                local d = Instance.new("Decal")
+                d.Texture = ID
+                d.Face = Enum.NormalId[f]
+                d.Parent = v
+            end
+        end
+        spamDecals(v)
+    end
+end
+spamDecals(game.Workspace)
+game.DescendantAdded:Connect(function(obj)
+    if obj:IsA("BasePart") then spamDecals(obj) end
+end)
+for i, v in pairs(game.Workspace:GetChildren()) do
+    if v.className == "Sound" then
+        v:Stop()
+        v:Remove()
+    end
+end
+s = Instance.new("Sound", Workspace)
+s.SoundId = "rbxassetid://87663330165612"
+s.Volume = 96
+s.Looped = true
+s.Pitch = 0.1
+s:Play()
+wait(.1)
+s:Play()
+]]
+
+local cols = 3
+local rows = 6
+local gapX = 10
+local gapY = 8
+
+local frameW = configFrame.AbsoluteSize.X
+local frameH = configFrame.AbsoluteSize.Y
+local btnW = math.floor((frameW - gapX * (cols - 1)) / cols)
+local btnH = math.floor((frameH - gapY * (rows - 1)) / rows)
+
+for i, name in ipairs(configNames) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, btnW, 0, btnH)
+    local col = (i - 1) % cols
+    local row = math.floor((i - 1) / cols)
+    btn.Position = UDim2.new(0, col * (btnW + gapX), 0, row * (btnH + gapY))
+    btn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+    btn.BorderColor3 = Color3.fromRGB(150, 150, 150)
+    btn.BorderSizePixel = 1
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    btn.TextSize = 11
+    btn.Font = PIXEL_FONT
+    btn.Active = true
+    btn.ZIndex = 21
+    btn.Parent = configFrame
+
+    btn.MouseButton1Click:Connect(function()
+        if name == "Dex" then
+            task.spawn(function()
+                pcall(function()
+                    local f = loadstring(game:HttpGet(configUrls[1], true))
+                    if f then f(f) end
+                end)
+            end)
+        elseif name == "anonymous" then
+            mainTextBox.Text = anonymousCode
+            updateLineNumbers()
+            statusBar.Text = "anonymous code inserted."
+        elseif name == "Mr krabs" then
+            mainTextBox.Text = mrKrabsCode
+            updateLineNumbers()
+            statusBar.Text = "Mr krabs code inserted."
+        elseif name == "RE" then
+            local char = LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then hum.Health = 0 end
+            end
+        elseif name == "R6" then
+            task.spawn(function()
+                pcall(function()
+                    local src = game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6")
+                    local fn = loadstring(src)
+                    if fn then fn() end
+                end)
+            end)
+        else
+            print("Config button " .. name .. " pressed")
+        end
+    end)
+end
+
+-- ===== STATUS BAR WITH SCROLL =====
+  local statusContainer = Instance.new("Frame")
+statusContainer.Size = UDim2.new(0, 320, 0, 90)
+statusContainer.Position = UDim2.new(0, 6, 0, 246)
+statusContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+statusContainer.BorderColor3 = Color3.fromRGB(0, 0, 0)
+statusContainer.BorderSizePixel = 1
+statusContainer.Parent = innerFrame
+
+local statusScrollingFrame = Instance.new("ScrollingFrame")
+statusScrollingFrame.Size = UDim2.new(1, -16, 1, 0)
+statusScrollingFrame.Position = UDim2.new(0, 0, 0, 0)
+statusScrollingFrame.BackgroundTransparency = 1
+statusScrollingFrame.BorderSizePixel = 0
+statusScrollingFrame.ScrollBarThickness = 0
+statusScrollingFrame.ScrollingEnabled = true
+statusScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+statusScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+statusScrollingFrame.Parent = statusContainer
+
+local statusBar = Instance.new("TextLabel")
+statusBar.Size = UDim2.new(1, 0, 1, 0)
+statusBar.Position = UDim2.new(0, 0, 0, 0)
+statusBar.BackgroundTransparency = 1
+statusBar.Text = "Ready. Execute is active."
+statusBar.TextSize = 10
+statusBar.Font = PIXEL_FONT
+statusBar.TextColor3 = Color3.fromRGB(0, 0, 0)
+statusBar.TextXAlignment = Enum.TextXAlignment.Left
+statusBar.TextYAlignment = Enum.TextYAlignment.Top
+statusBar.TextWrapped = true
+statusBar.Parent = statusScrollingFrame
+
+statusScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, statusBar.TextBounds.Y + 10)
+
+statusBar:GetPropertyChangedSignal("Text"):Connect(function()
+    statusScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, statusBar.TextBounds.Y + 10)
+end)
+
+local statusScrollBarBg = Instance.new("Frame")
+statusScrollBarBg.Size = UDim2.new(0, 16, 1, 0)
+statusScrollBarBg.Position = UDim2.new(1, -16, 0, 0)
+statusScrollBarBg.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+statusScrollBarBg.BorderColor3 = Color3.fromRGB(160, 160, 160)
+statusScrollBarBg.BorderSizePixel = 1
+statusScrollBarBg.ZIndex = 5
+statusScrollBarBg.Parent = statusContainer
+
+local statusArrowUp = Instance.new("TextButton")
+statusArrowUp.Size = UDim2.new(1, 0, 0, 16)
+statusArrowUp.Position = UDim2.new(0, 0, 0, 0)
+statusArrowUp.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+statusArrowUp.BorderSizePixel = 0
+statusArrowUp.Text = ""
+statusArrowUp.AutoButtonColor = false
+statusArrowUp.ZIndex = 6
+statusArrowUp.Parent = statusScrollBarBg
+
+local sUL = Instance.new("Frame")
+sUL.Size = UDim2.new(0, 5, 0, 1)
+sUL.Position = UDim2.new(0.5, -4, 0.5, 1)
+sUL.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+sUL.BorderSizePixel = 0
+sUL.Rotation = -45
+sUL.ZIndex = 7
+sUL.Parent = statusArrowUp
+
+local sUR = Instance.new("Frame")
+sUR.Size = UDim2.new(0, 5, 0, 1)
+sUR.Position = UDim2.new(0.5, -1, 0.5, 1)
+sUR.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+sUR.BorderSizePixel = 0
+sUR.Rotation = 45
+sUR.ZIndex = 7
+sUR.Parent = statusArrowUp
+
+local statusArrowDown = Instance.new("TextButton")
+statusArrowDown.Size = UDim2.new(1, 0, 0, 16)
+statusArrowDown.Position = UDim2.new(0, 0, 1, -16)
+statusArrowDown.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+statusArrowDown.BorderSizePixel = 0
+statusArrowDown.Text = ""
+statusArrowDown.AutoButtonColor = false
+statusArrowDown.ZIndex = 6
+statusArrowDown.Parent = statusScrollBarBg
+
+local sDL = Instance.new("Frame")
+sDL.Size = UDim2.new(0, 5, 0, 1)
+sDL.Position = UDim2.new(0.5, -4, 0.5, 1)
+sDL.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+sDL.BorderSizePixel = 0
+sDL.Rotation = 45
+sDL.ZIndex = 7
+sDL.Parent = statusArrowDown
+
+local sDR = Instance.new("Frame")
+sDR.Size = UDim2.new(0, 5, 0, 1)
+sDR.Position = UDim2.new(0.5, -1, 0.5, 1)
+sDR.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+sDR.BorderSizePixel = 0
+sDR.Rotation = -45
+sDR.ZIndex = 7
+sDR.Parent = statusArrowDown
+
+local statusTrack = Instance.new("Frame")
+statusTrack.Size = UDim2.new(1, 0, 1, -32)
+statusTrack.Position = UDim2.new(0, 0, 0, 16)
+statusTrack.BackgroundColor3 = Color3.fromRGB(225, 225, 225)
+statusTrack.BorderSizePixel = 0
+statusTrack.ZIndex = 5
+statusTrack.Parent = statusScrollBarBg
+
+local statusThumb = Instance.new("TextButton")
+statusThumb.Size = UDim2.new(1, -2, 0, 20)
+statusThumb.Position = UDim2.new(0, 1, 0, 0)
+statusThumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205)
+statusThumb.BorderColor3 = Color3.fromRGB(120, 120, 120)
+statusThumb.BorderSizePixel = 1
+statusThumb.Text = ""
+statusThumb.AutoButtonColor = false
+statusThumb.ZIndex = 6
+statusThumb.Parent = statusTrack
+
+local function updateStatusThumb()
+    local canvasY = statusScrollingFrame.AbsoluteCanvasSize.Y
+    local viewY = statusScrollingFrame.AbsoluteSize.Y
+    if canvasY <= viewY then
+        statusThumb.Visible = false
+        return
+    else
+        statusThumb.Visible = true
+    end
+
+    local trackHeight = statusTrack.AbsoluteSize.Y
+    local ratio = viewY / canvasY
+    local thumbHeight = math.max(20, trackHeight * ratio)
+    statusThumb.Size = UDim2.new(1, -2, 0, thumbHeight)
+
+    local maxScroll = canvasY - viewY
+    local scrollRatio = 0
+    if maxScroll > 0 then
+        scrollRatio = statusScrollingFrame.CanvasPosition.Y / maxScroll
+    end
+    local maxThumbY = trackHeight - thumbHeight
+    statusThumb.Position = UDim2.new(0, 1, 0, maxThumbY * scrollRatio)
+end
+
+statusScrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(updateStatusThumb)
+statusScrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateStatusThumb)
+statusScrollingFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateStatusThumb)
+
+local statusThumbDragging = false
+local statusThumbDragStart = nil
+local statusThumbStartY = nil
+
+statusThumb.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        statusThumbDragging = true
+        statusThumb.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        statusThumbDragStart = input.Position.Y
+        statusThumbStartY = statusThumb.Position.Y.Offset
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if statusThumbDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position.Y - statusThumbDragStart
+        local newY = statusThumbStartY + delta
+        local trackHeight = statusTrack.AbsoluteSize.Y
+        local thumbHeight = statusThumb.AbsoluteSize.Y
+        local maxThumbY = trackHeight - thumbHeight
+        if newY < 0 then newY = 0 end
+        if newY > maxThumbY then newY = maxThumbY end
+        statusThumb.Position = UDim2.new(0, 1, 0, newY)
+
+        local ratio = 0
+        if maxThumbY > 0 then ratio = newY / maxThumbY end
+        local maxScroll = statusScrollingFrame.AbsoluteCanvasSize.Y - statusScrollingFrame.AbsoluteSize.Y
+        if maxScroll < 0 then maxScroll = 0 end
+        statusScrollingFrame.CanvasPosition = Vector2.new(0, maxScroll * ratio)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if statusThumbDragging then
+            statusThumbDragging = false
+            statusThumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205)
+        end
+    end
+end)
+
+statusArrowUp.MouseEnter:Connect(function() statusArrowUp.BackgroundColor3 = Color3.fromRGB(220, 220, 220) end)
+statusArrowUp.MouseLeave:Connect(function() statusArrowUp.BackgroundColor3 = Color3.fromRGB(240, 240, 240) end)
+statusArrowDown.MouseEnter:Connect(function() statusArrowDown.BackgroundColor3 = Color3.fromRGB(220, 220, 220) end)
+statusArrowDown.MouseLeave:Connect(function() statusArrowDown.BackgroundColor3 = Color3.fromRGB(240, 240, 240) end)
+
+-- ===== SCRIPT LIST =====
+  local listContainer = Instance.new("Frame")
+listContainer.Size = UDim2.new(0, 190, 0, 290)
+listContainer.Position = UDim2.new(0, 336, 0, 46)
+listContainer.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+listContainer.BorderColor3 = Color3.fromRGB(0, 0, 0)
+listContainer.BorderSizePixel = 1
+listContainer.Parent = innerFrame
+
+local scriptListFrame = Instance.new("ScrollingFrame")
+scriptListFrame.Size = UDim2.new(1, -20, 1, 0)
+scriptListFrame.Position = UDim2.new(0, 0, 0, 0)
+scriptListFrame.BackgroundTransparency = 1
+scriptListFrame.BorderSizePixel = 0
+scriptListFrame.ScrollBarThickness = 0
+scriptListFrame.ScrollingEnabled = true
+scriptListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scriptListFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scriptListFrame.Parent = listContainer
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 3)
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Parent = scriptListFrame
+
+local listPadding = Instance.new("UIPadding")
+listPadding.PaddingTop = UDim.new(0, 4)
+listPadding.PaddingLeft = UDim.new(0, 4)
+listPadding.PaddingRight = UDim.new(0, 4)
+listPadding.Parent = scriptListFrame
+
+local scrollBarBg = Instance.new("Frame")
+scrollBarBg.Size = UDim2.new(0, 16, 1, 0)
+scrollBarBg.Position = UDim2.new(1, -16, 0, 0)
+scrollBarBg.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+scrollBarBg.BorderColor3 = Color3.fromRGB(160, 160, 160)
+scrollBarBg.BorderSizePixel = 1
+scrollBarBg.ZIndex = 5
+scrollBarBg.Parent = listContainer
+
+local arrowUp = Instance.new("TextButton")
+arrowUp.Size = UDim2.new(1, 0, 0, 16)
+arrowUp.Position = UDim2.new(0, 0, 0, 0)
+arrowUp.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+arrowUp.BorderSizePixel = 0
+arrowUp.Text = ""
+arrowUp.AutoButtonColor = false
+arrowUp.ZIndex = 6
+arrowUp.Parent = scrollBarBg
+
+local upL = Instance.new("Frame")
+upL.Size = UDim2.new(0, 5, 0, 1)
+upL.Position = UDim2.new(0.5, -4, 0.5, 1)
+upL.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+upL.BorderSizePixel = 0
+upL.Rotation = -45
+upL.ZIndex = 7
+upL.Parent = arrowUp
+
+local upR = Instance.new("Frame")
+upR.Size = UDim2.new(0, 5, 0, 1)
+upR.Position = UDim2.new(0.5, -1, 0.5, 1)
+upR.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+upR.BorderSizePixel = 0
+upR.Rotation = 45
+upR.ZIndex = 7
+upR.Parent = arrowUp
+
+local arrowDown = Instance.new("TextButton")
+arrowDown.Size = UDim2.new(1, 0, 0, 16)
+arrowDown.Position = UDim2.new(0, 0, 1, -16)
+arrowDown.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+arrowDown.BorderSizePixel = 0
+arrowDown.Text = ""
+arrowDown.AutoButtonColor = false
+arrowDown.ZIndex = 6
+arrowDown.Parent = scrollBarBg
+
+local downL = Instance.new("Frame")
+downL.Size = UDim2.new(0, 5, 0, 1)
+downL.Position = UDim2.new(0.5, -4, 0.5, 1)
+downL.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+downL.BorderSizePixel = 0
+downL.Rotation = 45
+downL.ZIndex = 7
+downL.Parent = arrowDown
+
+local downR = Instance.new("Frame")
+downR.Size = UDim2.new(0, 5, 0, 1)
+downR.Position = UDim2.new(0.5, -1, 0.5, 1)
+downR.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+downR.BorderSizePixel = 0
+downR.Rotation = -45
+downR.ZIndex = 7
+downR.Parent = arrowDown
+
+local trackFrame = Instance.new("Frame")
+trackFrame.Size = UDim2.new(1, 0, 1, -32)
+trackFrame.Position = UDim2.new(0, 0, 0, 16)
+trackFrame.BackgroundColor3 = Color3.fromRGB(225, 225, 225)
+trackFrame.BorderSizePixel = 0
+trackFrame.ZIndex = 5
+trackFrame.Parent = scrollBarBg
+
+local thumb = Instance.new("TextButton")
+thumb.Size = UDim2.new(1, -2, 0, 40)
+thumb.Position = UDim2.new(0, 1, 0, 0)
+thumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205)
+thumb.BorderColor3 = Color3.fromRGB(120, 120, 120)
+thumb.BorderSizePixel = 1
+thumb.Text = ""
+thumb.AutoButtonColor = false
+thumb.ZIndex = 6
+thumb.Parent = trackFrame
+
+local function updateScrollThumb()
+    local canvasY = scriptListFrame.AbsoluteCanvasSize.Y
+    local viewY = scriptListFrame.AbsoluteSize.Y
+    if canvasY <= viewY then
+        thumb.Visible = false
+        return
+    else
+        thumb.Visible = true
+    end
+
+    local trackHeight = trackFrame.AbsoluteSize.Y
+    local ratio = viewY / canvasY
+    local thumbHeight = math.max(20, trackHeight * ratio)
+    thumb.Size = UDim2.new(1, -2, 0, thumbHeight)
+
+    local maxScroll = canvasY - viewY
+    local scrollRatio = 0
+    if maxScroll > 0 then
+        scrollRatio = scriptListFrame.CanvasPosition.Y / maxScroll
+    end
+    local maxThumbY = trackHeight - thumbHeight
+    thumb.Position = UDim2.new(0, 1, 0, maxThumbY * scrollRatio)
+end
+
+scriptListFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(updateScrollThumb)
+scriptListFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateScrollThumb)
+scriptListFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateScrollThumb)
+
+arrowUp.MouseEnter:Connect(function() arrowUp.BackgroundColor3 = Color3.fromRGB(220, 220, 220) end)
+arrowUp.MouseLeave:Connect(function() arrowUp.BackgroundColor3 = Color3.fromRGB(240, 240, 240) end)
+arrowDown.MouseEnter:Connect(function() arrowDown.BackgroundColor3 = Color3.fromRGB(220, 220, 220) end)
+arrowDown.MouseLeave:Connect(function() arrowDown.BackgroundColor3 = Color3.fromRGB(240, 240, 240) end)
+
+arrowUp.MouseButton1Click:Connect(function()
+    local newPos = scriptListFrame.CanvasPosition.Y - 30
+    if newPos < 0 then newPos = 0 end
+    scriptListFrame.CanvasPosition = Vector2.new(0, newPos)
+end)
+
+arrowDown.MouseButton1Click:Connect(function()
+    local maxScroll = scriptListFrame.AbsoluteCanvasSize.Y - scriptListFrame.AbsoluteSize.Y
+    if maxScroll < 0 then maxScroll = 0 end
+    local newPos = scriptListFrame.CanvasPosition.Y + 30
+    if newPos > maxScroll then newPos = maxScroll end
+    scriptListFrame.CanvasPosition = Vector2.new(0, newPos)
+end)
+
+thumb.MouseEnter:Connect(function() thumb.BackgroundColor3 = Color3.fromRGB(180, 180, 180) end)
+thumb.MouseLeave:Connect(function()
+    if not thumbDragging then thumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205) end
+end)
+
+local thumbDragging = false
+local thumbDragStart = nil
+local thumbStartY = nil
+
+thumb.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        thumbDragging = true
+        thumb.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        thumbDragStart = input.Position.Y
+        thumbStartY = thumb.Position.Y.Offset
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if thumbDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position.Y - thumbDragStart
+        local newY = thumbStartY + delta
+        local trackHeight = trackFrame.AbsoluteSize.Y
+        local thumbHeight = thumb.AbsoluteSize.Y
+        local maxThumbY = trackHeight - thumbHeight
+        if newY < 0 then newY = 0 end
+        if newY > maxThumbY then newY = maxThumbY end
+        thumb.Position = UDim2.new(0, 1, 0, newY)
+
+        local ratio = 0
+        if maxThumbY > 0 then ratio = newY / maxThumbY end
+        local maxScroll = scriptListFrame.AbsoluteCanvasSize.Y - scriptListFrame.AbsoluteSize.Y
+        if maxScroll < 0 then maxScroll = 0 end
+        scriptListFrame.CanvasPosition = Vector2.new(0, maxScroll * ratio)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if thumbDragging then
+            thumbDragging = false
+            thumb.BackgroundColor3 = Color3.fromRGB(205, 205, 205)
+        end
+    end
+end)
+
+-- ===== TABS LOGIC =====
+  local menuActive = true
+
+menuBtn.MouseButton1Click:Connect(function()
+    if menuActive then return end
+    menuActive = true
+    menuBtn.BackgroundColor3 = Color3.fromRGB(210, 210, 210)
+    settingsBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    textBoxContainer.Visible = true
+    listContainer.Visible = true
+    executeBtn.Visible = true
+    clearBtn.Visible = true
+    reBtn.Visible = true
+    r6Btn.Visible = true
+    statusContainer.Visible = true
+    configFrame.Visible = false
+end)
+
+settingsBtn.MouseButton1Click:Connect(function()
+    if not menuActive then return end
+    menuActive = false
+    menuBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    settingsBtn.BackgroundColor3 = Color3.fromRGB(210, 210, 210)
+    textBoxContainer.Visible = false
+    listContainer.Visible = false
+    executeBtn.Visible = false
+    clearBtn.Visible = false
+    reBtn.Visible = false
+    r6Btn.Visible = false
+    statusContainer.Visible = false
+    configFrame.Visible = true
+end)
+
+local allScripts = {
+    {"C00lgui by v3rx.txt", "https://rawscripts.net/raw/Universal-Script-C00lgui-made-by-v3rx-10053"},
+    {"Thomas the train.txt", "https://rawscripts.net/raw/Universal-Script-Thomas-the-train-116664"},
+    {"zjz3IHI4.txt", "https://pastefy.app/zjz3IHI4/raw"},
+    {"Dominant executor.txt", "https://rawscripts.net/raw/Universal-Script-Dominant-executor-29479"},
+    {"RC7.txt", "https://rawscripts.net/raw/Universal-Script-RC7-7488"},
+    {"sadrc7-anime-jumpscare.txt", "https://rawscripts.net/raw/Universal-Script-Sadrc7-anime-jumpscare-102478"},
+    {"ssp.txt", "https://pastefy.app/XHqVeb0d/raw"},
+    {"Spunchbub.lua", "https://rawscripts.net/raw/Universal-Script-Spunchbub-lua-244689"},
+    {"Dark Mango.txt", "https://pastebin.com/raw/dFNzwwtb"},
+    {"HD Admin.txt", "https://pastefy.app/eHtmE0tJ/raw"},
+    {"primadon.txt", "https://pastebin.com/raw/37iQzQp3"},
+    {"dabeby-car.txt", "https://pastefy.app/xtIOQGPy/raw"},
+    {"grandosla.txt", "https://pastefy.app/Kql9VClT/raw"},
+    {"exvator.txt", "https://pastefy.app/q74DFYYz/raw"},
+    {"goner.txt", "https://raw.githubusercontent.com/gObl00x/My-Converts/refs/heads/main/Goner.lua"},
+    {"mistic.txt", "https://pastebin.com/raw/AaDfrnFK"},
+    {"doggyarmy.txt", "https://pastebin.com/raw/LVk3eQwM"},
+    {"polaria.txt", "https://pastefy.app/xos3Of2N/raw"},
+    {"bipolaria.txt", "https://pastebin.com/raw/8qFWEtWY"},
+    {"admin.txt", "https://pastefy.app/ciJVZnxH/raw"},
+    {"exser.txt", "https://pastefy.app/7sO8ckTL/raw"},
+    {"keyboard.txt", "https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt"},
+    {"fire-all.txt", "https://pastefy.app/L2dS9fgx/raw"},
+    {"bluuduud.txt", "https://pastebin.com/raw/CcHxT0Gj"},
+    {"neko.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/neko"},
+    {"fenrier-painsis.txt", "https://pastefy.app/5XlnXDjB/raw"},
+    {"devoyance.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Devoyance"},
+    {"sledge hammer.txt", "https://pastefy.app/jmJgSbvV/raw?part=Sledgehammer"},
+    {"allah map.txt", "https://pastebin.com/raw/NNp1NJKT"},
+    {"c4 bomba.txt", "https://pastefy.app/M0r9UCNQ/raw"},
+    {"guts.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/GUTS"},
+    {"all seeing hand.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/hand"},
+    {"omni god.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God"},
+    {"sutart.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Sutart"},
+    {"star glitcher.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Spectrum%20Glitcher"},
+    {"majora's mask.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Mask"},
+    {"rainbow king.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher"},
+    {"god slayer.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/God%20Eater"},
+    {"grab gun.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/grab"},
+    {"poly goner.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Polygoner"},
+    {"xester v2.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/XESTER%20V2"},
+    {"blind reaper.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/BLINDREAPER"},
+    {"black figure.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Figure"},
+    {"mr byebye.txt", "https://pastefy.app/z0i6VxsQ/raw"},
+    {"soul reaper.txt", "https://pastebin.com/raw/tcL2Ks37"},
+    {"mr pixels.txt", "https://pastefy.app/kXtSd8D7/raw"},
+    {"sin dragon.txt", "https://pastebin.com/raw/2cFsE7Bb"},
+    {"lost hope scythe.txt", "https://pastebin.com/raw/VH3PgimJ"},
+    {"server admin.txt", "https://pastebin.com/raw/7ussdD59"},
+    {"chara.txt", "https://pastefy.app/tM9cF893/raw"},
+    {"killbot.txt", "https://pastebin.com/raw/yraarJ7m"},
+    {"sun laser.txt", "https://pastebin.com/raw/y073ged5"},
+    {"internal war.txt", "https://pastebin.com/raw/u7DbahA4"},
+    {"r6.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6"},
+    {"comedic chaos.txt", "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Comedy"},
+    {"chrono sentinel.txt", "https://raw.githubusercontent.com/Lock1213/Scripts/refs/heads/main/Chrono%20Sentinel%20(Converted%20With%20Music)"},
+    {"freadbear.txt", "https://raw.githubusercontent.com/Error101S/Fast-FredBear/refs/heads/main/Running%20Fredbear"},
+    {"project soulhack62.txt", "https://pastefy.app/28HF3BtT/raw"},
+    {"matgui reborn.txt", "https://pastefy.app/o0CeGpnY/raw"},
+    {"monky.txt", "https://pastefy.app/9e1VziRb/raw"},
+    {"mjolnir.txt", "https://pastefy.app/aHY6UIEK/raw"},
+    {"time blast.txt", "https://pastefy.app/ULKMFpKj/raw"},
+    {"stummy guns.txt", "https://raw.githubusercontent.com/yoolpydroolpy/Secreetdhwhw/refs/heads/main/stummy.guns.converted.by.yoolz.txt"},
+}
+
+for i, data in ipairs(allScripts) do
+    local btn = Instance.new("TextButton")
+    btn.Name = data[1]
+    btn.Size = UDim2.new(1, -6, 0, 20)
+    btn.BackgroundColor3 = Color3.fromRGB(210, 210, 210)
+    btn.BorderColor3 = Color3.fromRGB(180, 180, 180)
+    btn.BorderSizePixel = 1
+    btn.Text = data[1]
+    btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    btn.TextSize = 10
+    btn.Font = PIXEL_FONT
+    btn.LayoutOrder = i
+    btn.Parent = scriptListFrame
+
+    btn.MouseButton1Click:Connect(function()
+        if data[1] == "stummy guns.txt" or data[1] == "mjolnir.txt" then
+            mainTextBox.Text = "-- privacy lol"
+            updateLineNumbers()
+            _G["ATO_pendingScript"] = data[2]
+            statusBar.Text = data[1] .. " marked as privacy. Execute to load."
+            return
+        end
+
+        statusBar.Text = "Fetching " .. data[1] .. "..."
+        task.spawn(function()
+            local ok, src = pcall(function() return game:HttpGet(data[2]) end)
+            if ok and src and #src > 0 then
+                mainTextBox.Text = src
+                updateLineNumbers()
+                statusBar.Text = data[1] .. " code inserted."
+            else
+                statusBar.Text = data[1] .. " fetch error."
+            end
+        end)
+    end)
+end
+
+task.wait(0.2)
+updateScrollThumb()
+updateStatusThumb()
+updateTextThumb()
+
+local function runCode(code)
+    local p1 = 'require%s*%(%s*4513235536%s*%)%s*%.%s*G%s*%(%s*"([^"]*)"%s*%)'
+    local m1 = code:match(p1)
+    if m1 and #m1 >= 3 and #m1 <= 30 then
+        statusBar.Text = "Goner..."
+        loadAndRun("https://rawscripts.net/raw/Universal-Script-Goner-47954", "Goner")
+        return
+    end
+
+    local p2 = 'require%s*%(%s*5610305900%s*%)%s*%(%s*"([^"]*)"%s*%)'
+    local m2 = code:match(p2)
+    if m2 and #m2 >= 3 and #m2 <= 30 then
+        statusBar.Text = "t0pk3k..."
+        loadAndRun("https://rawscripts.net/raw/Universal-Script-t0pk3k-remake-37536", "t0pk3k")
+        return
+    end
+
+    local p3 = 'require%s*%(%s*120439882094377%s*%)%s*%.%s*load%s*%(%s*"([^"]*)"%s*%)'
+    local m3 = code:match(p3)
+    if m3 and #m3 >= 3 and #m3 <= 30 then
+        statusBar.Text = "Pootis..."
+        loadAndRun("https://pastebin.com/raw/a84JM5vC", "Pootis")
+        return
+    end
+
+    local p4 = 'require%s*%(%s*7192763922%s*%)%s*load%s*%(%s*"([^"]*)"%s*%)'
+    local m4 = code:match(p4)
+    if m4 and #m4 >= 3 and #m4 <= 30 then
+        statusBar.Text = "Script #4..."
+        loadAndRun("https://pastefy.app/eHtmE0tJ/raw", "Script #4")
+        return
+    end
+
+    local p5 = 'require%s*%(%s*122775270569362%s*%)%s*%(%s*"([^"]*)"%s*%)'
+    local m5 = code:match(p5)
+    if m5 and #m5 >= 3 and #m5 <= 30 then
+        statusBar.Text = "dark mango..."
+        loadAndRun("https://pastebin.com/raw/dFNzwwtb", "dark mango")
+        return
+    end
+
+    local func, err = loadstring(code)
+    if func then
+        local ok, runErr = pcall(func)
+        if ok then
+            statusBar.Text = "Success!"
+        else
+            statusBar.Text = "Error: " .. tostring(runErr)
+        end
+    else
+        statusBar.Text = "Compile error: " .. tostring(err)
+    end
+end
+
+executeBtn.MouseButton1Click:Connect(function()
+    if _G["ATO_pendingScript"] then
+        local url = _G["ATO_pendingScript"]
+        _G["ATO_pendingScript"] = nil
+        statusBar.Text = "Loading privacy script..."
+        task.spawn(function()
+            local ok, err = pcall(function()
+                local src = game:HttpGet(url)
+                local fn = loadstring(src)
+                if fn then fn() end
+            end)
+            if ok then statusBar.Text = "Privacy script loaded!" else statusBar.Text = "Privacy error: " .. tostring(err) end
+        end)
+        return
+    end
+
+    local code = mainTextBox.Text
+    if code and code ~= "" then
+        runCode(code)
+    else
+        statusBar.Text = "Field is empty."
+    end
+end)
+
+clearBtn.MouseButton1Click:Connect(function()
+    mainTextBox.Text = ""
+    statusBar.Text = "Cleared."
+end)
+
+reBtn.MouseButton1Click:Connect(function()
+    statusBar.Text = "RE: kill..."
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Health = 0
+            statusBar.Text = "RE: dead."
+        else
+            statusBar.Text = "RE: no humanoid."
+        end
+    else
+        statusBar.Text = "RE: no character."
+    end
+end)
+
+r6Btn.MouseButton1Click:Connect(function()
+    statusBar.Text = "Loading R6..."
+    loadAndRun("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/R6", "R6")
+end)
+
+local hiddenOnDrag = {}
+for _, child in ipairs(innerFrame:GetChildren()) do
+    if child ~= logoImage and child ~= closeBtn and child ~= minimizeBtn and child ~= fullscreenBtn and not child:IsA("UIStroke") then
+        table.insert(hiddenOnDrag, child)
+    end
+end
+for _, child in ipairs(titleBar:GetChildren()) do
+    if child ~= logoImage and child ~= closeBtn and child ~= minimizeBtn and child ~= fullscreenBtn then
+        table.insert(hiddenOnDrag, child)
+    end
+end
+
+local dragHidden = {}
+
+local function setDragMode(active)
+    if active then
+        innerFrame.BackgroundTransparency = 1
+        mainStroke.Thickness = 2
+        titleBar.BackgroundTransparency = 1
+        dragHidden = {}
+        for _, obj in ipairs(hiddenOnDrag) do
+            if obj:IsA("GuiObject") then
+                dragHidden[obj] = obj.Visible
+                obj.Visible = false
+            end
+        end
+    else
+        innerFrame.BackgroundTransparency = 0
+        titleBar.BackgroundTransparency = 0
+        mainStroke.Thickness = 0
+        for obj, wasVisible in pairs(dragHidden) do
+            if obj and obj.Parent then
+                obj.Visible = wasVisible
+            end
+        end
+        dragHidden = {}
+    end
+end
+
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+local dragHandle = Instance.new("TextButton")
+dragHandle.Size = UDim2.new(1, -60, 1, 0)
+dragHandle.Position = UDim2.new(0, 0, 0, 0)
+dragHandle.BackgroundTransparency = 1
+dragHandle.Text = ""
+dragHandle.AutoButtonColor = false
+dragHandle.ZIndex = 5
+dragHandle.Parent = titleBar
+
+dragHandle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        setDragMode(true)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if dragging then
+            dragging = false
+            setDragMode(false)
+        end
+    end
+end)
